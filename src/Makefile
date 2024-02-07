@@ -22,7 +22,7 @@ clean:
 	rm -f $(OBJS)
 	rm -f $(DEPS)
 
-$(NAME): $(OBJS)	
+$(NAME): $(OBJS) # static libraries are just archives of objs to be linked later
 	ar rcs $(BUILD_DIR)/$(NAME) $(OBJS)
 
 $(OBJ_DIR)/%.o: %.c # can't use $(SOURCE) or $(OBJS) because weird make pattern rules

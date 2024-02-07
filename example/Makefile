@@ -24,6 +24,7 @@ clean:
 	rm -f $(DEPS)
 
 $(NAME): $(OBJS)	
+	$(MAKE) -C ../src # run library makefile
 	$(CC) $(OBJS) -o $(BUILD_DIR)/$(NAME) $(LD_FLAGS)
 
 $(OBJ_DIR)/%.o: %.c # can't use $(SOURCE) or $(OBJS) because weird make pattern rules
