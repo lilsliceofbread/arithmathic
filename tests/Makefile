@@ -1,7 +1,7 @@
-NAME := example
+NAME := tests
 CC := gcc
 CC_FLAGS := -g -Wall -Wpedantic -Wextra -Wconversion -O2 # compiler flags
-CPP_FLAGS := -MMD -MP -I../src/inc -Iinc # preprocessor flags
+CPP_FLAGS := -MMD -MP -I../src/inc # preprocessor flags
 LD_FLAGS := -L../build -larithmathic -lm
 
 BUILD_DIR := ../build/$(NAME)

@@ -21,6 +21,7 @@ directories:
 clean:
 	rm -f $(OBJS)
 	rm -f $(DEPS)
+	rm -f $(BUILD_DIR)/$(NAME)
 
 $(NAME): $(OBJS) # static libraries are just archives of objs to be linked later
 	ar rcs $(BUILD_DIR)/$(NAME) $(OBJS)
