@@ -17,12 +17,14 @@ typedef u32* matrix_t; // ptr to the first 2 elements of the matrix struct, the 
  * have to swap height and width because mat_transpose will swap them
 */
 #define MATRIX(var_name, height, width, ...)                      \
-    struct {u32 w; u32 h; f32 data[width * height];} var_name = { \
+    struct {u32 w; u32 h; f64 data[width * height];} var_name = { \
         .w = (height),                                            \
         .h = (width),                                             \
         .data = {__VA_ARGS__},                                    \
     };                                                            \
     matrix_transpose(MATRIX_PTR(var_name))
+
+//#define MATRIX_MUTABLE(var_name, heat, width, ...)
 
 /**
  * @param  mat: matrix to be transposed

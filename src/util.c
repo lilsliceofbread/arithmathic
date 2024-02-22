@@ -32,9 +32,9 @@ void find_directory_from_path(char* buffer, u32 length, const char* path)
 {
     GET_LAST_FILE_SEPARATOR(last_char);
     ARITH_ASSERT(last_char != NULL, "invalid path %s\n", path);
-    i32 offset = (i32)(last_char - path);
+    u32 offset = (u32)(last_char - path);
 
-    u32 str_end = (u32)offset < length ? (u32)offset : length;
+    u32 str_end = offset < length ? offset : length;
     strncpy(buffer, path, str_end); // copy up to final / into directory
     buffer[str_end] = '\0';
 }

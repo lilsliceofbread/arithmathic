@@ -7,10 +7,10 @@
 #define MAX_CHARS 8192
 
 #define MATRIX_GET_STRUCT(mat_ptr)                     \
-    struct {u32* w; u32* h; f32* data;} _##mat_ptr = { \
+    struct {u32* w; u32* h; f64* data;} _##mat_ptr = { \
         .w = &((u32*)mat_ptr)[0],                      \
         .h = &((u32*)mat_ptr)[1],                      \
-        .data = &((f32*)mat_ptr)[2],                   \
+        .data = &((f64*)mat_ptr)[1],                   \
     };
 void matrix_transpose(matrix_t mat)
 {
@@ -18,7 +18,7 @@ void matrix_transpose(matrix_t mat)
 
     u32 width = *_mat.w;
     u32 height = *_mat.h;
-    f32 new[width * height];
+    f64 new[width * height];
 
     for(u32 i = 0; i < height; i++)
     {
@@ -30,7 +30,7 @@ void matrix_transpose(matrix_t mat)
     
     *_mat.w = height;
     *_mat.h = width;
-    memcpy(_mat.data, &new, width * height * sizeof(float));
+    memcpy(_mat.data, &new, width * height * sizeof(f64));
 }
 
 void matrix_multiply(matrix_t out, const matrix_t mat1, const matrix_t mat2)
@@ -60,7 +60,7 @@ void matrix_multiply(matrix_t out, const matrix_t mat1, const matrix_t mat2)
         return;
     }
 
-    memset(_out.data, 0, out_w * out_h * sizeof(float)); // set all floats in output matrix to zero
+    memset(_out.data, 0, out_w * out_h * sizeof(f64)); // set all floats in output matrix to zero
 
     /* out(j, i) = sum of mat1(j, k) * mat2(k, i) */
     for(u32 i = 0; i < out_w; i++)

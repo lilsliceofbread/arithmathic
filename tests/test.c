@@ -16,7 +16,6 @@
 void test_impl(bool success, const char* msg, ...)
 {
     va_list args;
-
     i32 colour;
     const char* prefix;
 

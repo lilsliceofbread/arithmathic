@@ -28,4 +28,6 @@
 
 #define ALIGNED_SIZE(size, alignment) ((size) % (alignment) == 0) ? (size) : (size) + ((alignment) - ((size) % (alignment)))
 
+#define CLAMP(val, lower, upper) ((val) < (lower)) ? (lower) : ((val) > (upper)) ? (upper) : (val)
+
 #endif

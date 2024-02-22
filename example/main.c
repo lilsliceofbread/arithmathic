@@ -1,28 +1,20 @@
 #include <stdio.h>
 #include "defines.h"
 #include "matrix.h"
+#include "complex.h"
 
 int main(void)
 {
-    MATRIX(mat1, 3, 3,
-        1, 2, 3,
-        4, 5, 6,
-        7, 8, 9 
-    );
-    matrix_print(MATRIX_PTR(mat1));
+    Complex z = {
+        .re = 1,
+        .im = 1,
+        .is_polar = true,
+    };
 
-    MATRIX(mat2, 3, 2,
-        1, 4,
-        2, 5,
-        3, 6
-    );
-    matrix_print(MATRIX_PTR(mat2));
+    complex_print(z);
 
-    MATRIX(result, 3, 2, 0);
-
-    matrix_multiply(MATRIX_PTR(result), MATRIX_PTR(mat1), MATRIX_PTR(mat2));
-
-    matrix_print(MATRIX_PTR(result));
+    Complex c = complex_pow(z, 5);
+    complex_print(c);
 
     return 0;
 }

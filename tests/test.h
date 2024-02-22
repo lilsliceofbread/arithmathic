@@ -9,5 +9,4 @@
 
 void test_impl(bool success, const char* msg, ...);
 
-
 #endif
