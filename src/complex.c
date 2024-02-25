@@ -1,42 +1,54 @@
 #include "complex.h"
 #include <math.h>
 
-Complex complex_to_polar(Complex z)
+Complex complex_conjugate(Complex z)
 {
-    Complex c;
-    
-    c.mod = sqrt(z.re * z.re + z.im * z.im);
-    c.arg = atan2(z.im, z.re);
-
+    Complex c = z;
+    c.im = -c.im; // works for polar form as well
     return c;
 }
 
-Complex complex_to_cartesian(Complex z)
+void complex_to_polar(Complex* z)
 {
+    if(z->is_polar) return;
     Complex c;
     
-    c.re = z.mod * cos(z.arg);
-    c.im = z.mod * sin(z.arg);
+    c.mod = complex_modulus(*z);
+    c.arg = atan2(z->im, z->re);
+    COMPLEX_PRINCIPAL_ARG(c.arg);
 
-    return c;
+    c.is_polar = true;
+    *z = c;
+}
+
+void complex_to_cartesian(Complex* z)
+{
+    if(!z->is_polar) return;
+    Complex c;
+    
+    c.re = z->mod * cos(z->arg);
+    c.im = z->mod * sin(z->arg);
+
+    c.is_polar = false;
+    *z = c;
 }
 
 Complex complex_add(Complex z, Complex w)
 {
     Complex c;
-    c.is_polar = false; // no polar when adding
 
     if(z.is_polar)
     {
-        z = complex_to_cartesian(z);
+        complex_to_cartesian(&z);
     }
     if(w.is_polar)
     {
-        w = complex_to_cartesian(w);
+        complex_to_cartesian(&w);
     }
 
     c.re = z.re + w.re;
     c.im = z.im + w.im;
+    c.is_polar = false; // no polar when adding
 
     return c;
 }
@@ -44,82 +56,97 @@ Complex complex_add(Complex z, Complex w)
 Complex complex_subtract(Complex z, Complex w)
 {
     Complex c;
-    c.is_polar = false; // no polar when adding
 
     if(z.is_polar)
     {
-        z = complex_to_cartesian(z);
+        complex_to_cartesian(&z);
     }
     if(w.is_polar)
     {
-        w = complex_to_cartesian(w);
+        complex_to_cartesian(&w);
     }
 
     c.re = z.re - w.re;
     c.im = z.im - w.im;
+    c.is_polar = false; // no polar when adding
 
     return c;
 }
 
 Complex complex_multiply(Complex z, Complex w)
 {
-    Complex c = {0};
-    c.is_polar = false;
+    bool should_be_cartesian = false;
 
-    if(z.is_polar && w.is_polar)
+    if(!z.is_polar)
     {
-        c.is_polar = true;
-        c.mod = z.mod * w.mod;
-        c.arg = z.arg + w.arg;
-
-        return c;
+        complex_to_polar(&z);
+        should_be_cartesian = true;
+    }
+    if(!w.is_polar)
+    {
+        complex_to_polar(&w);
+        should_be_cartesian = true;
     }
 
-    if(z.is_polar)
-    {
-        z = complex_to_cartesian(z);
-    }
-    if(w.is_polar)
-    {
-        w = complex_to_cartesian(w);
-    }
+    Complex c = {
+        .mod = z.mod * w.mod,
+        .arg = z.arg + w.arg,
+        .is_polar = true,
+    };
+    COMPLEX_PRINCIPAL_ARG(c.arg);
 
-    c.re += z.re * w.re;
-
-    c.im += z.re * w.im;
-    c.im += z.im * w.re;
-
-    c.re -= z.im * w.im; // i^2 = -1
+    if(should_be_cartesian) complex_to_cartesian(&c);
 
     return c;
 }
 
-Complex complex_pow(Complex z, u32 power)
+Complex complex_divide(Complex z, Complex w)
 {
-    if(z.is_polar) // de moivre's theorem
-    {
-        Complex c = {
-            .mod = pow(z.mod, (f64)power),
-            .arg = (f64)power * z.arg,
-            .is_polar = true,
-        };
+    bool should_be_cartesian = false;
 
-        return c;
+    if(!z.is_polar)
+    {
+        complex_to_polar(&z);
+        should_be_cartesian = true;
+    }
+    if(!w.is_polar)
+    {
+        complex_to_polar(&w);
+        should_be_cartesian = true;
     }
 
-    if(power == 0) // somehow
+    Complex c = {
+        .mod = z.mod * w.mod,
+        .arg = z.arg + w.arg,
+        .is_polar = true,
+    };
+    COMPLEX_PRINCIPAL_ARG(c.arg);
+
+    if(should_be_cartesian) complex_to_cartesian(&c);
+
+    return c;
+}
+
+Complex complex_pow(Complex z, f64 power)
+{
+    bool should_be_cartesian = false;
+
+    if(!z.is_polar)
     {
-        Complex c = { // this works for polar or cartesian
-            .re = 1.0,
-            .im = 0.0,
-            .is_polar = z.is_polar,
-        };
-
-        return c;
+        complex_to_polar(&z);
+        should_be_cartesian = true;
     }
-    if(power == 1) return z;
 
-    return complex_multiply(z, complex_pow(z, power - 1));
+    Complex c = { // de moivre's theorem
+        .mod = pow(z.mod, power),
+        .arg = power * z.arg,
+        .is_polar = true,
+    };
+    COMPLEX_PRINCIPAL_ARG(c.arg);
+
+    if(should_be_cartesian) complex_to_cartesian(&c);
+
+    return c;
 }
 
 void complex_print(Complex z)

@@ -26,6 +26,11 @@
     }
 #endif
 
+#define      ARITH_PI 3.14159265358979323846
+#define ARITH_DEG2RAD 0.01745329251994329576 // PI / 180
+
+#define RADIANS(deg) ((deg) * ARITH_DEG2RAD)
+
 #define ALIGNED_SIZE(size, alignment) ((size) % (alignment) == 0) ? (size) : (size) + ((alignment) - ((size) % (alignment)))
 
 #define CLAMP(val, lower, upper) ((val) < (lower)) ? (lower) : ((val) > (upper)) ? (upper) : (val)

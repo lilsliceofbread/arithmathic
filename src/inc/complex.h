@@ -2,10 +2,10 @@
 #define ARITH_COMPLEX_H
 
 #include "defines.h"
+#include "math.h"
 
-#define COMPLEX_PRINCIPAL_ARG(z) 
+#define COMPLEX_PRINCIPAL_ARG(arg) arg = (arg > ARITH_PI || arg < -ARITH_PI) ? arg - (2 * ARITH_PI * (int)(arg / (2 * ARITH_PI))) : arg
 
-// user will have to keep track of if polar or cartesian :/
 typedef struct Complex
 {
     union
@@ -24,14 +24,40 @@ typedef struct Complex
     bool is_polar;
 } Complex;
 
-Complex complex_to_polar(Complex z);
-Complex complex_to_cartesian(Complex z);
+static inline f64 complex_modulus(Complex z)
+{
+    return z.is_polar ? z.mod : sqrt(z.re * z.re + z.im * z.im);
+}
 
+Complex complex_conjugate(Complex z);
+
+void complex_to_polar(Complex* z);
+void complex_to_cartesian(Complex* z);
+
+/**
+ * @returns cartesian form
+ * */
 Complex complex_add(Complex z, Complex w);
+
+/**
+ * @returns cartesian form
+ * */
 Complex complex_subtract(Complex z, Complex w);
+
+/**
+ * @returns polar form if both z and w were polar and cartesian otherwise 
+ * */
 Complex complex_multiply(Complex z, Complex w);
 
-Complex complex_pow(Complex z, u32 pow);
+/**
+ * @returns polar form if both z and w were polar and cartesian otherwise 
+ * */
+Complex complex_divide(Complex z, Complex w);
+
+/**
+ * @returns polar form if both z and w were polar and cartesian otherwise 
+ * */
+Complex complex_pow(Complex z, f64 power);
 
 void complex_print(Complex z);
 
