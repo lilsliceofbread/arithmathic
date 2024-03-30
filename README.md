@@ -1,6 +1,6 @@
 # arithmathic
 
-random maths library in c
+c library of various maths functions
 
 # compiling
 
