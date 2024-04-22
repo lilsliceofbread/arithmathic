@@ -35,4 +35,8 @@
 
 #define CLAMP(val, lower, upper) ((val) < (lower)) ? (lower) : ((val) > (upper)) ? (upper) : (val)
 
+#define SQUARED(num) (num) * (num) 
+
+#define SQUARED_DIST(x1, y1, x2, y2) SQUARED((x2) - (x1)) + SQUARED((y2) - (y1))
+
 #endif

@@ -59,3 +59,15 @@ void find_file_from_path(char* buffer, u32 length, const char* path)
     strncpy(buffer, last_char + 1, length);
     buffer[length - 1] = '\0'; // just in case
 }
+
+void skip_whitespace(const char** cursor, u32 max_distance)
+{
+    for(u32 i = 0; i < max_distance; i++)
+    {
+        char c = *(++(*cursor));
+        if(c != ' ' && c != '\t')
+        {
+            return; 
+        }
+    }
+}
