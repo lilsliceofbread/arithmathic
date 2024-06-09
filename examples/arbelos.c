@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 {
     if(argc != 6)
     {
-        ARITH_LOG_NO_CTX(LOG_ERROR, "please provide arguments in the form\n ./executable [filename] [width] [height] [radius of semicircle 1] [radius of semicircle 2]\n");
+        ARITH_LOG_NO_CTX(LOG_ERROR, "please provide arguments in the form\n ./executable [filename] [image width] [image height] [radius of semicircle 1] [radius of semicircle 2]\n");
         return -1;
     }
 
