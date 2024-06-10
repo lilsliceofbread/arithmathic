@@ -1,52 +1,39 @@
 #include "parser.h"
+
+#include "defines.h"
 #include "util.h"
-
-/**
- * internal functions
- */
-
-/**
- * @param  length: max length of expression string and of tokens buffer
- */
-bool tokenise_expression(Token* tokens, u32 length, const char* expression);
+#include "string.h"
+#include "binary_tree.h"
 
 f64 evaluate_expression(const char* expression, u32 str_length)
 {
     //f64 answer;
     Token tokens[str_length];
+    u32 token_count = 0;
+    TreeNode* tree;
 
-    if(!tokenise_expression(tokens, str_length, expression))
+    if(!tokenise_expression(tokens, str_length, expression, &token_count))
     {
         return 0.0;
     }
 
-    for(u32 i = 0; i < 15; i++)
+    if(!generate_syntax_tree(&tree, tokens, token_count))
     {
-        const char* type;
-        switch(tokens[i].type)
-        {
-            case TOKEN_NUM:
-                type = "NUM";
-                break;
-            case TOKEN_OPERATOR:
-                type = "OPERATOR";
-                break;
-            case TOKEN_BRACKET:
-                type = "BRACKET";
-                break;
-        }
-
-        ARITH_LOG(LOG_INFO, "%u %s: %s", i, type, tokens[i].str);
+        return 0.0;
     }
 
+    binary_tree_free(tree);
     //return answer;
     return 0.0;
 }
 
-bool tokenise_expression(Token* tokens, u32 length, const char* expression)
+bool tokenise_expression(Token* tokens, u32 length, const char* expression, u32* token_count_out)
 {
+    memset(tokens, 0, length * sizeof(Token)); // ensure all strings are zeroed so string ends 
+
     u32 token_num = 0;
-    for(u32 i = 0; i < length - 2; i++)
+
+    for(u32 i = 0; i < length; i++)
     {
         char c = expression[i];
         switch(c)
@@ -113,14 +100,26 @@ bool tokenise_expression(Token* tokens, u32 length, const char* expression)
             case '\0':
             case '\n':
                 ARITH_LOG(LOG_INFO, "ended on newline or null character in tokenisation\n");
+                *token_count_out = token_num;
                 return true;
     
             default:
                 ARITH_LOG(LOG_ERROR, "failed to tokenise expression, invalid character\n");
+                *token_count_out = 0;
                 return false;
         }
         token_num++;
     }
+
+    *token_count_out = token_num;
+    return true;
+}
+
+bool generate_syntax_tree(TreeNode** tree_out, Token* tokens, u32 token_count)
+{
+    // zero is top of syntax tree i think?
+    // because it's the answer to the expression
+    binary_tree_create(tree_out, NULL, sizeof(Token)); // don't know what to put for size of data, float or Token
 
     return true;
 }
