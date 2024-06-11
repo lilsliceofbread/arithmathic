@@ -10,8 +10,9 @@
 typedef enum TokenType
 {
     TOKEN_NUM,
-    TOKEN_OPERATOR, // operator operates on numbers on either side?
-    TOKEN_BRACKET, // open and closed bracket separate?
+    TOKEN_OPERATOR,
+    TOKEN_BRACKET,
+    TOKEN_EOF,
 } TokenType;
 
 typedef struct Token
@@ -23,14 +24,13 @@ typedef struct Token
 f64 evaluate_expression(const char* expression, u32 str_length);
 
 /**
- * internal functions; in header to be testable
- */
-/**
  * @param  length: max length of expression string and of tokens buffer (should be same length for worst case e.g. 1+1+1+1+1...)
- * @returns token count
  */
-bool tokenise_expression(Token* tokens, u32 length, const char* expression, u32* token_count_out);
+bool tokenise_expression(Token* tokens, u32 length, const char* expression);
 
-bool generate_syntax_tree(TreeNode** tree_out, Token* tokens, u32 token_count);
+/**
+ * @param  tree_out: returns head node of tree
+ */
+bool generate_syntax_tree(Token* tokens, TreeNode** tree_out);
 
 #endif

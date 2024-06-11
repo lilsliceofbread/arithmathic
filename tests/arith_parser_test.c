@@ -7,9 +7,8 @@ bool test_tokenise_expression(void)
     const char* expression = "(123 + 456) / 2";
     u32 length = (u32)strlen(expression);
     Token tokens[length];
-    u32 token_count = 0;
 
-    Token expected_tokens[7] = {
+    Token expected_tokens[8] = {
         {.type = TOKEN_BRACKET, .str = "("},
         {.type = TOKEN_NUM, .str = "123"},
         {.type = TOKEN_OPERATOR, .str = "+"},
@@ -17,12 +16,11 @@ bool test_tokenise_expression(void)
         {.type = TOKEN_BRACKET, .str = ")"},
         {.type = TOKEN_OPERATOR, .str = "/"},
         {.type = TOKEN_NUM, .str = "2"},
+        {.type = TOKEN_EOF, .str = ""},
     };
-    tokenise_expression(tokens, length, expression, &token_count);
+    tokenise_expression(tokens, length, expression);
 
-    if(token_count != 7) return false;
-
-    for(u32 i = 0; i < token_count; i++)
+    for(u32 i = 0; i < 8; i++)
     {
         if(tokens[i].type == expected_tokens[i].type
         && strcmp(tokens[i].str, expected_tokens[i].str) == 0)

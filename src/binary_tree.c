@@ -1,43 +1,26 @@
 #include "binary_tree.h"
 #include <memory.h>
 
-/**
- * internal functions
- */
-
-TreeNode* binary_tree_node_create(void* data, u32 bytes);
-
-void binary_tree_create(TreeNode** head, void* data, u32 bytes)
+void binary_tree_node_create(TreeNode** node, TreeNode* parent, void* data, u32 bytes)
 {
-    (*head) = binary_tree_node_create(data, bytes); // double pointer so user can't forget to keep pointer and it gets leaked
-}
-
-void binary_tree_insert_left(TreeNode* parent, void* data, u32 bytes)
-{
-    if(parent->left != NULL)
+    if(*node != NULL)
     {
-        ARITH_LOG(LOG_ERROR, "attempted to insert into already filled child slot of parent tree node");
+        ARITH_LOG(LOG_ERROR, "cannot create node because pointer is not NULL");
         return;
     }
 
-    TreeNode* node = binary_tree_node_create(data, bytes);
+    TreeNode* new_node = (TreeNode*)malloc(sizeof(TreeNode));
 
-    parent->left = node;
-
-}
-
-void binary_tree_insert_right(TreeNode* parent, void* data, u32 bytes)
-{
-    if(parent->left != NULL)
+    new_node->parent = parent; // NULL means no parent, yet
+    new_node->left = NULL; // no children yet
+    new_node->right = NULL;
+    new_node->data = malloc(bytes);
+    if(data != NULL)
     {
-        ARITH_LOG(LOG_ERROR, "attempted to insert into already filled child slot of parent tree node");
-        return;
+        memcpy(new_node->data, data, bytes);
     }
 
-    TreeNode* node = binary_tree_node_create(data, bytes);
-
-    parent->right = node;
-
+    *node = new_node;
 }
 
 void binary_tree_free(TreeNode* head)
@@ -56,17 +39,39 @@ void binary_tree_free(TreeNode* head)
     }
 }
 
-TreeNode* binary_tree_node_create(void* data, u32 bytes)
+void binary_tree_insert(TreeNode* parent, void* data, u32 bytes)
 {
-    TreeNode* node = (TreeNode*)malloc(sizeof(TreeNode));
+    TreeNode* child = NULL;
 
-    node->left = NULL; // no children yet
-    node->right = NULL;
-    node->data = malloc(bytes);
-    if(data != NULL)
+    if(parent->left == NULL)
     {
-        memcpy(node->data, data, bytes);
+        binary_tree_node_create(&child, parent, data, bytes);
+        parent->left = child;
+        return;
     }
 
-    return node;
+    if(parent->right == NULL)
+    {
+        binary_tree_node_create(&child, parent, data, bytes);
+        parent->right = child;
+        return;
+    }
+
+    ARITH_LOG(LOG_ERROR, "tree node already has 2 children");
+}
+
+void binary_tree_insert_parent(TreeNode* child, void* data, u32 bytes)
+{
+    TreeNode* parent = NULL;
+
+    if(child->parent != NULL)
+    {
+        ARITH_LOG(LOG_ERROR, "tree node already has parent");
+        return;
+    }
+
+    binary_tree_node_create(&parent, NULL, data, bytes);
+
+    child->parent = parent;
+    parent->left = child;
 }
