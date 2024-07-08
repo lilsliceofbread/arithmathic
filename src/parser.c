@@ -5,14 +5,31 @@
 #include "string.h"
 #include "binary_tree.h"
 
+// cool video by VoxelRifts on this: https://www.youtube.com/watch?v=myZcNjKcVGw
+
+enum {
+    PRECEDENCE_ZERO = 0,
+    PRECEDENCE_AS = 1,
+    PRECEDENCE_MD = 2,
+    PRECEDENCE_I = 3,
+};
+
+static u8 precedence_table[OPERATOR_MAX] = {
+    [OPERATOR_PLUS] = PRECEDENCE_AS,
+    [OPERATOR_MINUS] = PRECEDENCE_AS,
+    [OPERATOR_MULTIPLY] = PRECEDENCE_MD,
+    [OPERATOR_DIVIDE] = PRECEDENCE_MD,
+    [OPERATOR_POWER] = PRECEDENCE_I,
+};
+
 /**
  * internal functions
  */
+TreeNode* parse_syntax_tree_node(TreeNode* prev, Token* tokens, u32 token_index, u8 last_operator_precedence);
 void tokenise_number(u32* i, Token* curr_token, const char* expression);
 
 f64 evaluate_expression(const char* expression, u32 str_length)
 {
-    //f64 answer;
     Token tokens[str_length];
     TreeNode* tree = NULL;
 
@@ -26,12 +43,13 @@ f64 evaluate_expression(const char* expression, u32 str_length)
         return 0.0;
     }
 
+    f64 result = evaluate_syntax_tree(tree);
+
     if(tree != NULL)
     {
         binary_tree_free(tree);
     }
-    //return answer;
-    return 0.0;
+    return result;
 }
 
 bool tokenise_expression(Token* tokens, u32 length, const char* expression)
@@ -71,7 +89,7 @@ bool tokenise_expression(Token* tokens, u32 length, const char* expression)
 
             case '(':
             case ')':
-                tokens[token_num].type = TOKEN_BRACKET; // ! MUST CHECK IN TREE IF EMPTY BRACKETS
+                tokens[token_num].type = TOKEN_BRACKET;
                 tokens[token_num].str[0] = c;
                 break;
 
@@ -99,19 +117,57 @@ bool tokenise_expression(Token* tokens, u32 length, const char* expression)
 
 bool generate_syntax_tree(Token* tokens, TreeNode** tree_out)
 {
-    TreeNode* curr_node = NULL;
+    TreeNode* node = parse_syntax_tree_node(NULL, tokens, 0, 0); //! SHOULD LAST OP PRECEDENCE BE 0?
 
-    //for()
-    //node create token no parent
+    //TreeNode* head = binary_tree_find_head(node);
 
-
-    //*tree_out = node; // HEAD NODE
+    //*tree_out = head;
     return true;
+}
+
+double evaluate_syntax_tree(TreeNode* head)
+{
+    double eval = 0.0f;
+
+    // evaluation
+
+    return eval;
 }
 
 /**
  * internal functions
  */
+
+TreeNode* parse_syntax_tree_node(TreeNode* prev, Token* tokens, u32 token_index, u8 last_operator_precedence)
+{
+    if(prev == NULL)
+    {
+
+    }
+
+    //! USE STNode
+
+    // recurse with new node as prev
+    switch(tokens[token_index].type)
+    {
+        case TOKEN_NUM:
+            break;
+
+        case TOKEN_OPERATOR:
+            break;
+
+        case TOKEN_BRACKET:
+            break;
+
+        case TOKEN_EOF:
+            break;
+    }
+
+    //WHAT IS BASE CASE
+    //return parent/child node of prev
+    //return ;
+}
+
 void tokenise_number(u32* i, Token* curr_token, const char* expression)
 {
     char c = expression[*i];

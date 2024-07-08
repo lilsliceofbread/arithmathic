@@ -21,6 +21,22 @@ typedef struct Token
     TokenType type;
 } Token;
 
+typedef enum Operator
+{
+    OPERATOR_PLUS,
+    OPERATOR_MINUS,
+    OPERATOR_MULTIPLY,
+    OPERATOR_DIVIDE,
+    OPERATOR_POWER,
+    OPERATOR_MAX,
+} Operator;
+
+typedef union STNode
+{
+    f64 number;
+    Operator operator;
+};
+
 f64 evaluate_expression(const char* expression, u32 str_length);
 
 /**
@@ -32,5 +48,7 @@ bool tokenise_expression(Token* tokens, u32 length, const char* expression);
  * @param  tree_out: returns head node of tree
  */
 bool generate_syntax_tree(Token* tokens, TreeNode** tree_out);
+
+double evaluate_syntax_tree(TreeNode* head);
 
 #endif
