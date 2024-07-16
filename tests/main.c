@@ -10,6 +10,7 @@ int main(void)
     ARITH_TEST(test_matrix_multiply());
 
     ARITH_TEST(test_tokenise_expression());
+    ARITH_TEST(test_evaluate_expression());
 
     /*
     ARITH_TEST(test_complex_to_polar());

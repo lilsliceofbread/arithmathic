@@ -5,4 +5,6 @@
 
 bool test_tokenise_expression(void);
 
+bool test_evaluate_expression(void);
+
 #endif

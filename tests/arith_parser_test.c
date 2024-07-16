@@ -33,3 +33,18 @@ bool test_tokenise_expression(void)
 
     return true;
 }
+
+bool test_evaluate_expression(void)
+{
+    const char* expression = "1 / 3 *3 - 4 + 3/ 3";
+
+    f64 result = evaluate_expression(expression, (u32)strlen(expression));
+    if(result != -2.0) return false;
+
+    // * testing if returns 0 with invalid expression, will cause an ERROR to be printed
+    expression = "1 -";
+    result = evaluate_expression(expression, (u32)strlen(expression));
+    if(result != 0.0) return false;
+
+    return true;
+}
