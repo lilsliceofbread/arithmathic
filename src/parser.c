@@ -195,7 +195,6 @@ TreeNode* parse_syntax_tree_node(Token* tokens, u32* token_index, u8 last_operat
         else
         {
             (*token_index)++;
-            printf("%u %s\n", *token_index, tokens[*token_index].str);
 
             TreeNode* parent = NULL;
             node.type = NODE_OPERATOR;
@@ -204,6 +203,7 @@ TreeNode* parse_syntax_tree_node(Token* tokens, u32* token_index, u8 last_operat
 
             parent->left = left;
             parent->right = parse_syntax_tree_node(tokens, token_index, curr_operator_precedence);
+            if(parent->right == NULL) return NULL; // also scuffed
 
             left = parent;
 
