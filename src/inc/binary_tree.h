@@ -36,4 +36,6 @@ void binary_tree_insert(TreeNode* parent, void* data, u32 bytes);
  */
 void binary_tree_insert_parent(TreeNode* child, void* data, u32 bytes);
 
+TreeNode* binary_tree_find_head(TreeNode* node);
+
 #endif

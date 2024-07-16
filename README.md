@@ -2,6 +2,8 @@
 
 c library of various maths functions
 
+indefinitely on hiatus (evaluate_expression does not work with brackets)
+
 # compiling
 
 requires GCC

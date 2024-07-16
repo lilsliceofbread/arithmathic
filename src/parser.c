@@ -1,8 +1,10 @@
 #include "parser.h"
 
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
 #include "defines.h"
 #include "util.h"
-#include "string.h"
 #include "binary_tree.h"
 
 // cool video by VoxelRifts on this: https://www.youtube.com/watch?v=myZcNjKcVGw
@@ -25,12 +27,13 @@ static u8 precedence_table[OPERATOR_MAX] = {
 /**
  * internal functions
  */
-TreeNode* parse_syntax_tree_node(TreeNode* prev, Token* tokens, u32 token_index, u8 last_operator_precedence);
+TreeNode* parse_syntax_tree_node(Token* tokens, u32* token_index, u8 last_operator_precedence);
 void tokenise_number(u32* i, Token* curr_token, const char* expression);
+Operator operator_from_token(Token token);
 
 f64 evaluate_expression(const char* expression, u32 str_length)
 {
-    Token tokens[str_length];
+    Token tokens[str_length + 1];
     TreeNode* tree = NULL;
 
     if(!tokenise_expression(tokens, str_length, expression))
@@ -100,7 +103,6 @@ bool tokenise_expression(Token* tokens, u32 length, const char* expression)
                 break;
 
             case '\0':
-                ARITH_LOG(LOG_INFO, "EOF on null character");
                 tokens[token_num].type = TOKEN_EOF;
                 return true;
     
@@ -117,55 +119,107 @@ bool tokenise_expression(Token* tokens, u32 length, const char* expression)
 
 bool generate_syntax_tree(Token* tokens, TreeNode** tree_out)
 {
-    TreeNode* node = parse_syntax_tree_node(NULL, tokens, 0, 0); //! SHOULD LAST OP PRECEDENCE BE 0?
+    u32 token_index = 0; // also scuffed but idc
+    TreeNode* node = parse_syntax_tree_node(tokens, &token_index, PRECEDENCE_ZERO);
 
-    //TreeNode* head = binary_tree_find_head(node);
+    if(node == NULL) return false;
 
-    //*tree_out = head;
+    TreeNode* head = binary_tree_find_head(node);
+
+    *tree_out = head;
+
     return true;
 }
 
 double evaluate_syntax_tree(TreeNode* head)
 {
-    double eval = 0.0f;
+    STNode node = *(STNode*)(head->data);
+    if(node.type == NODE_NUM)
+    {
+        return node.number;
+    }
 
-    // evaluation
+    switch(node.operator)
+    {
+        case OPERATOR_PLUS:
+            return evaluate_syntax_tree(head->left) + evaluate_syntax_tree(head->right);
+        case OPERATOR_MINUS:
+            return evaluate_syntax_tree(head->left) - evaluate_syntax_tree(head->right);
+        case OPERATOR_MULTIPLY:
+            return evaluate_syntax_tree(head->left) * evaluate_syntax_tree(head->right);
+        case OPERATOR_DIVIDE:
+            return evaluate_syntax_tree(head->left) / evaluate_syntax_tree(head->right);
+        case OPERATOR_POWER:
+            return pow(evaluate_syntax_tree(head->left), evaluate_syntax_tree(head->right));
+    }
 
-    return eval;
+    return 0.0;
 }
 
 /**
  * internal functions
  */
 
-TreeNode* parse_syntax_tree_node(TreeNode* prev, Token* tokens, u32 token_index, u8 last_operator_precedence)
+TreeNode* parse_syntax_tree_node(Token* tokens, u32* token_index, u8 last_operator_precedence)
 {
-    if(prev == NULL)
+    if(tokens[*token_index].type != TOKEN_NUM)
     {
-
+        ARITH_LOG(LOG_ERROR, "expected number token type");
+        return NULL; //! leaks memory but idc anymore
     }
 
-    //! USE STNode
+    TreeNode* left = NULL;
+    STNode node;
+    node.type = NODE_NUM;
+    node.number = strtod(tokens[*token_index].str, NULL);
+    binary_tree_node_create(&left, NULL, (void*)&node, sizeof(STNode));
+    (*token_index)++;
 
-    // recurse with new node as prev
-    switch(tokens[token_index].type)
+    if(tokens[*token_index].type != TOKEN_OPERATOR)
     {
-        case TOKEN_NUM:
-            break;
+        if(tokens[*token_index].type == TOKEN_EOF) return left;
 
-        case TOKEN_OPERATOR:
-            break;
-
-        case TOKEN_BRACKET:
-            break;
-
-        case TOKEN_EOF:
-            break;
+        ARITH_LOG(LOG_ERROR, "expected operator token type");
+        return NULL;
     }
 
-    //WHAT IS BASE CASE
-    //return parent/child node of prev
-    //return ;
+    Operator curr_operator = operator_from_token(tokens[*token_index]);
+    u8 curr_operator_precedence = precedence_table[curr_operator];
+
+    while(curr_operator_precedence != PRECEDENCE_ZERO)
+    {
+        if(last_operator_precedence >= curr_operator_precedence)
+        {
+            break;    
+        }
+        else
+        {
+            (*token_index)++;
+            printf("%u %s\n", *token_index, tokens[*token_index].str);
+
+            TreeNode* parent = NULL;
+            node.type = NODE_OPERATOR;
+            node.operator = curr_operator;
+            binary_tree_node_create(&parent, NULL, (void*)&node, sizeof(STNode));
+
+            parent->left = left;
+            parent->right = parse_syntax_tree_node(tokens, token_index, curr_operator_precedence);
+
+            left = parent;
+
+            if(tokens[*token_index].type != TOKEN_OPERATOR)
+            {
+                if(tokens[*token_index].type == TOKEN_EOF) return left;
+
+                ARITH_LOG(LOG_ERROR, "expected operator token type");
+                return NULL;
+            }
+            curr_operator = operator_from_token(tokens[*token_index]);
+            curr_operator_precedence = precedence_table[curr_operator];
+        }
+    }
+
+    return left;
 }
 
 void tokenise_number(u32* i, Token* curr_token, const char* expression)
@@ -197,4 +251,28 @@ void tokenise_number(u32* i, Token* curr_token, const char* expression)
         }
     }
     --(*i);
+}
+
+Operator operator_from_token(Token token)
+{
+    if(token.type != TOKEN_OPERATOR)
+    {
+        ARITH_LOG(LOG_ERROR, "trying to obtain operator from non-operator token\n");
+    }
+
+    switch(token.str[0])
+    {
+        case '+':
+            return OPERATOR_PLUS;
+        case '-':
+            return OPERATOR_MINUS;
+        case '*':
+            return OPERATOR_MULTIPLY;
+        case '/':
+            return OPERATOR_DIVIDE;
+        case '^':
+            return OPERATOR_POWER;
+    }
+
+    return OPERATOR_MAX;
 }

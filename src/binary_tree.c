@@ -25,18 +25,24 @@ void binary_tree_node_create(TreeNode** node, TreeNode* parent, void* data, u32 
 
 void binary_tree_free(TreeNode* head)
 {
+    if(head == NULL)
+    {
+        ARITH_LOG(LOG_ERROR, "tried to free tree head which is NULL\n");
+        return;
+    }
+
     free(head->data);
 
     if(head->left != NULL)
     {
         binary_tree_free(head->left);
-        free(head->left);
     }
     if(head->right != NULL)
     {
         binary_tree_free(head->right);
-        free(head->right);
     }
+
+    free(head);
 }
 
 void binary_tree_insert(TreeNode* parent, void* data, u32 bytes)
@@ -74,4 +80,14 @@ void binary_tree_insert_parent(TreeNode* child, void* data, u32 bytes)
 
     child->parent = parent;
     parent->left = child;
+}
+
+TreeNode* binary_tree_find_head(TreeNode* node)
+{
+    if(node->parent == NULL)
+    {
+        return node;
+    }
+
+    return binary_tree_find_head(node->parent);
 }

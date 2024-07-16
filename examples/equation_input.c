@@ -17,6 +17,7 @@ int main(void)
         return -1;
     }
 
-    evaluate_expression(expression, MAX_CHAR_LENGTH);
+    f64 result = evaluate_expression(expression, MAX_CHAR_LENGTH);
+    printf("Expression result: %lf\n", result);
     return 0;
 }

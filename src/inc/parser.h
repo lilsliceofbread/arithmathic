@@ -31,12 +31,25 @@ typedef enum Operator
     OPERATOR_MAX,
 } Operator;
 
-typedef union STNode
+typedef enum STNodeType
 {
-    f64 number;
-    Operator operator;
-};
+    NODE_NUM,
+    NODE_OPERATOR,
+} STNodeType;
 
+typedef struct STNode
+{
+    STNodeType type;
+    union
+    {
+        f64 number;
+        Operator operator;
+    };
+} STNode;
+
+/**
+ * @note  BRACKETS ARE NOT IMPLEMENTED AND WILL NOT BE IMPLEMENTED FOR A WHILE
+ */
 f64 evaluate_expression(const char* expression, u32 str_length);
 
 /**
